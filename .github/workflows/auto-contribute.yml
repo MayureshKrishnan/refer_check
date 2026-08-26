@@ -1,0 +1,25 @@
+name: Auto Contribute
+
+on:
+  schedule:
+    # Runs every day at 12:00 PM UTC (5:30 PM IST)
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Make automatic contribution
+        run: |
+          echo "Daily contribution: $(date)" >> README.md
+          git config --global user.name "MayureshKrishnan"
+          git config --global user.email "mayureshkrishnan684@gmail.com"
+          git add README.md
+          git commit -m "Auto contribution $(date +'%Y-%m-%d')"
+          git push

@@ -2,7 +2,7 @@ name: Auto Contribute
 
 on:
   schedule:
-    # Runs every day at 12:00 PM UTC (5:30 PM IST)
+    # Runs once every day at 12:00 PM UTC (5:30 PM IST)
     - cron: '0 12 * * *'
   workflow_dispatch:
 
@@ -15,11 +15,27 @@ jobs:
         with:
           persist-credentials: true
 
-      - name: Make automatic contribution
+      - name: Make random contribution (60% probability)
         run: |
-          echo "Daily contribution: $(date)" >> README.md
-          git config --global user.name "MayureshKrishnan"
-          git config --global user.email "mayureshkrishnan684@gmail.com"
-          git add README.md
-          git commit -m "Auto contribution $(date +'%Y-%m-%d')"
-          git push
+          # Generate a random integer between 0 and 99
+          RAND_VAL=$(( RANDOM % 100 ))
+          echo "Random rollout: $RAND_VAL (Threshold: < 60)"
+          
+          if [ $RAND_VAL -lt 60 ]; then
+            # Random number of commits between 1 and 10
+            NUM_COMMITS=$(( ( RANDOM % 10 ) + 1 ))
+            echo "Committing $NUM_COMMITS times today..."
+            
+            git config --global user.name "MayureshKrishnan"
+            git config --global user.email "mayureshkrishnan684@gmail.com"
+            
+            for i in $(seq 1 $NUM_COMMITS); do
+              echo "Contribution: $(date) - commit #$i" >> README.md
+              git add README.md
+              git commit -m "Auto contribution $(date +'%Y-%m-%d %H:%M:%S')"
+            done
+            
+            git push
+          else
+            echo "Skipping contributions today to maintain ~60% annual frequency."
+          fi
